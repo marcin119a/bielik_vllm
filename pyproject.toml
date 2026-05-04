@@ -1,0 +1,34 @@
+[project]
+name = "bielik-agent"
+version = "0.1.0"
+description = "Bielik AI Agent z MCP, streamingiem i FastAPI"
+requires-python = ">=3.12"
+dependencies = [
+    "openai>=1.82.0",
+    "openai-agents>=0.0.19",
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.34.0",
+    "python-dotenv>=1.1.0",
+    "mcp>=1.8.0",
+    "httpx>=0.28.0",
+    "pydantic>=2.11.0",
+    "pydantic-settings>=2.9.0",
+    "fastmcp>=3.2.4",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.11.0",
+    "pyright>=1.1.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.pyright]
+pythonVersion = "3.12"
+typeCheckingMode = "standard"
