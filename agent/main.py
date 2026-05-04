@@ -50,7 +50,7 @@ async def main():
 
         result = await Runner.run(
             agent,
-            "Jaka jest dzisiejsza data?",
+            "Jak sie masz? nie wywoluj toola z godzina",
             run_config=RunConfig(tracing_disabled=True),
         )
         print(result.final_output)

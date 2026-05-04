@@ -72,6 +72,38 @@ uv run vllm serve "speakleash/Bielik-4.5B-v3.0-Instruct" \
     --max-num-batched-tokens 32768
 ```
 
+Jeśli pojawia się problem z pamięcią GPU, można użyć jednego z poniższych wariantów:
+
+**Opcja 1: mniejszy batch i krótszy kontekst**
+
+```bash
+uv run vllm serve "speakleash/Bielik-4.5B-v3.0-Instruct" \
+    --enable-auto-tool-choice \
+    --tool-parser-plugin ./bielik-tools/tools/bielik_vllm_tool_parser.py \
+    --tool-call-parser bielik \
+    --chat-template ./bielik-tools/tools/bielik_advanced_chat_template.jinja \
+    --port 8000 \
+    --host 0.0.0.0 \
+    --max-num-batched-tokens 8192 \
+    --max-model-len 4096
+```
+
+**Opcja 2: dodatkowe oszczędzanie pamięci KV cache**
+
+```bash
+uv run vllm serve "speakleash/Bielik-4.5B-v3.0-Instruct" \
+    --enable-auto-tool-choice \
+    --tool-parser-plugin ./bielik-tools/tools/bielik_vllm_tool_parser.py \
+    --tool-call-parser bielik \
+    --chat-template ./bielik-tools/tools/bielik_advanced_chat_template.jinja \
+    --port 8000 \
+    --host 0.0.0.0 \
+    --max-num-batched-tokens 8192 \
+    --max-model-len 4096 \
+    --gpu-memory-utilization 0.85 \
+    --kv-cache-dtype fp8
+```
+
 ### 2. MCP Server
 
 ```bash
