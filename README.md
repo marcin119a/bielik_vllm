@@ -60,7 +60,19 @@ API_PORT=8080
 
 ## Uruchomienie
 
-### 1. MCP Server
+### 1. vLLM
+
+```bash
+uv run vllm serve "speakleash/Bielik-4.5B-v3.0-Instruct" \
+    --enable-auto-tool-choice \
+    --tool-parser-plugin ./bielik-tools/tools/bielik_vllm_tool_parser.py \
+    --tool-call-parser bielik \
+    --chat-template ./bielik-tools/tools/bielik_advanced_chat_template.jinja \
+    --port 8000 --host 0.0.0.0 \
+    --max-num-batched-tokens 32768
+```
+
+### 2. MCP Server
 
 ```bash
 uv run python -m mcp_server.server
@@ -68,7 +80,7 @@ uv run python -m mcp_server.server
 
 Serwer startuje na `http://127.0.0.1:8001/mcp`.
 
-### 2. Agent (tryb CLI)
+### 3. Agent (tryb CLI)
 
 ```bash
 uv run python -m agent.main
