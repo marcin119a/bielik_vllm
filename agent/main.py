@@ -9,7 +9,7 @@ from config import settings
 mcp_helper_server = MCPServerStreamableHttp(
     name="My MCP Server",
     params={
-        "url": "http://127.0.0.1:8001/mcp",
+        "url": settings.mcp_url,
     },
 )
 
@@ -31,12 +31,21 @@ async def ensure_vllm_available() -> None:
         ) from exc
 
 
-async def main():
-    openai_client = AsyncOpenAI(
+def build_openai_client() -> AsyncOpenAI:
+    if settings.use_openai:
+        return AsyncOpenAI(api_key=settings.openai_api_key)
+    return AsyncOpenAI(
         base_url=settings.vllm_base_url,
         api_key=settings.openai_api_key,
     )
-    await ensure_vllm_available()
+
+
+async def main():
+    openai_client = build_openai_client()
+
+    if not settings.use_openai:
+        await ensure_vllm_available()
+
     async with mcp_helper_server:
         agent = Agent(
             name="Zegarmistrz światła purpurowy",
