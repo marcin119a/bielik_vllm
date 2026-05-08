@@ -16,12 +16,6 @@ spec:
           envFrom:
             - configMapRef:
                 name: agent-config
-          env:
-            - name: OPENAI_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: openai-secret
-                  key: openai-api-key
           resources:
             requests:
               memory: "256Mi"

@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vllm-server
+  namespace: ai-agent
+  labels:
+    app: vllm-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vllm-server
+  template:
+    metadata:
+      labels:
+        app: vllm-server
+    spec:
+      volumes:
+        - name: model-cache
+          persistentVolumeClaim:
+            claimName: vllm-model-cache
+      containers:
+        - name: vllm-server
+          image: vllm/vllm-openai:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - --model
+            - speakleash/Bielik-4.5B-v3.0-Instruct
+            - --device
+            - cpu
+            - --dtype
+            - bfloat16
+            - --max-model-len
+            - "2048"
+            - --enforce-eager
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - name: model-cache
+              mountPath: /root/.cache/huggingface
+          env:
+            - name: HF_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: hf-secret
+                  key: hf-token
+                  optional: true
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 120
+            periodSeconds: 30
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            failureThreshold: 10
+          resources:
+            requests:
+              memory: "8Gi"
+              cpu: "2"
+            limits:
+              memory: "16Gi"
+              cpu: "4"
