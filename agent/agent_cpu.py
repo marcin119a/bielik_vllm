@@ -1,7 +1,14 @@
 import asyncio
 import psutil
+from pydantic import BaseModel
 
 from agents import Agent, Runner, function_tool, handoff
+
+
+class Output(BaseModel):
+    cpu_percent: float
+    high_usage: bool
+    recommendation: str
 
 
 @function_tool
@@ -17,21 +24,20 @@ cpu_agent = Agent(
     name="CPU Agent",
     instructions="""
     Sprawdź CPU narzędziem check_cpu.
-    Jeśli high_usage=True, ostrzeż użytkownika i podaj krótką rekomendację.
+    Zwróć wynik zgodny ze schematem Output.
+    Jeśli high_usage=True, dodaj krótką rekomendację.
     """,
     tools=[check_cpu],
+    output_type=Output,
 )
 
 main_agent = Agent(
     name="Main Agent",
     instructions="""
-    Jesteś głównym agentem.
     Jeśli użytkownik pyta o CPU lub wydajność systemu,
     przekaż zadanie do CPU Agent.
     """,
-    handoffs=[
-        handoff(cpu_agent),
-    ],
+    handoffs=[handoff(cpu_agent)],
 )
 
 
@@ -40,7 +46,9 @@ async def main():
         main_agent,
         "Sprawdź zużycie CPU",
     )
-    print(result.final_output)
+
+    output: Output = result.final_output
+    print(output)
 
 
 if __name__ == "__main__":
